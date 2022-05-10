@@ -225,6 +225,12 @@ android {
         }
     }
     signingConfigs {
+        release {
+          storeFile file('cherry_docs_key.keystore')
+          storePassword 'cherry_docs_key'
+          keyAlias 'cherry_docs_key'
+          keyPassword 'cherry_docs_key'
+        }
         debug {
             storeFile file('debug.keystore')
             storePassword 'android'
@@ -239,7 +245,7 @@ android {
         release {
             // Caution! In production, you need to generate your own keystore file.
             // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }

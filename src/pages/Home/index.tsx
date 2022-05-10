@@ -1,4 +1,10 @@
-import React, { useCallback, useMemo, useRef } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {
   Alert,
   StyleProp,
@@ -25,23 +31,58 @@ import {
 import { wait } from '../../util/wait';
 import { whatsAppMessageLink } from '../../util/whatsAppMessakeLink';
 import { saveComponentCapture } from '../../util/saveComponentCapture';
+import axios from 'axios';
 
 const phoneNumber = '5513997244863';
 const textScrollContainerStyle: StyleProp<ViewStyle> = { flexGrow: 1 };
+
+interface RandomCatsFactsAPIResponse {
+  status: {
+    verified: null;
+    sentCount: number;
+  };
+  _id: string;
+  user: string;
+  text: string;
+  type: string;
+  deleted: boolean;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+}
 
 const Home: React.FC = () => {
   const textScrollViewRef = useRef<ScrollView>(null);
   const textAreaRef = useRef<TextInput>(null);
 
-  const [text, setText] = React.useState('');
-  const [isEditing, setIsEditing] = React.useState(false);
-  const [useEncoded, setUseEncoded] = React.useState(false);
-  const [isDarkTheme, setIsDarkTheme] = React.useState(false);
+  const [text, setText] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
+  const [useEncoded, setUseEncoded] = useState(true);
+  const [isDarkTheme, setIsDarkTheme] = useState(false);
+  const [hasFetchedCatFact, setHasFetchedCatFact] = useState(false);
 
   const iconsColor = useMemo(
     () => (isDarkTheme ? '#909090' : '#000'),
     [isDarkTheme],
   );
+
+  useEffect(() => {
+    const mustFetchCatFact = !text.trim() && !hasFetchedCatFact;
+
+    if (mustFetchCatFact) {
+      axios
+        .get<RandomCatsFactsAPIResponse>(
+          'https://cat-fact.herokuapp.com/facts/random',
+        )
+        .then((response) => {
+          if (mustFetchCatFact) {
+            setText(response.data.text);
+            setHasFetchedCatFact(true);
+          }
+        })
+        .catch((err) => console.log(err));
+    }
+  }, [hasFetchedCatFact, text]);
 
   const prepareTextToBeCaptured = useCallback(async () => {
     setIsEditing(false);
@@ -66,8 +107,7 @@ const Home: React.FC = () => {
                 onPress: () =>
                   whatsAppMessageLink({
                     phoneNumber,
-                    message:
-                      'Ae lindão. Deu erro aqui na hora de gerar a imagem do cherry code 😢',
+                    message: '',
                   }),
               },
             ],

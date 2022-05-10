@@ -48,7 +48,7 @@ interface TextAreaProps {
 
 export const TextArea = styled.TextInput.attrs<TextAreaProps>(
   ({ isDarkTheme }) => ({
-    placeholderTextColor: isDarkTheme ? '#555555' : '#868686',
+    placeholderTextColor: isDarkTheme ? '#555555' : '#b6b6b6',
     textAlignVertical: 'top',
   }),
 )<TextAreaProps>`
